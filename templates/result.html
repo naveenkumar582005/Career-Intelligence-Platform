@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}
+Analysis Completed
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+<div class="card shadow-lg border-0">
+
+<div class="card-body text-center">
+
+<i class="bi bi-check-circle-fill text-success display-1"></i>
+
+<h1 class="mt-4">
+
+Career Analysis Completed Successfully
+
+</h1>
+
+<p class="lead">
+
+Your resume has been analyzed successfully.
+
+Click below to view your complete Career Intelligence Dashboard.
+
+</p>
+
+<hr>
+
+<div class="row mt-4">
+
+<div class="col-md-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>
+
+Placement
+
+</h5>
+
+<h2 class="text-primary">
+
+{{ placement_probability }}%
+
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>
+
+Resume
+
+</h5>
+
+<h2 class="text-success">
+
+{{ resume_score }}
+
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>
+
+Technical
+
+</h5>
+
+<h2 class="text-warning">
+
+{{ technical_strength }}
+
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>
+
+Career
+
+</h5>
+
+<h2 class="text-danger">
+
+{{ career_readiness }}
+
+</h2>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="mt-5">
+
+<a
+
+href="/dashboard"
+
+class="btn btn-primary btn-lg">
+
+Open Dashboard
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

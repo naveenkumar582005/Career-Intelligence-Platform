@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Career Intelligence Platform
+
+{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO SECTION ================= -->
+
+<section class="py-5">
+
+<div class="row align-items-center">
+
+<div class="col-lg-6">
+
+<h1 class="display-4 fw-bold">
+
+Career Intelligence Platform
+
+</h1>
+
+<p class="lead mt-4">
+
+An AI-powered platform that predicts placement opportunities,
+analyzes resumes, recommends suitable job roles,
+identifies skill gaps, and provides personalized career roadmaps.
+
+</p>
+
+<div class="mt-4">
+
+<a href="/upload"
+class="btn btn-primary btn-lg me-3">
+
+Upload Resume
+
+</a>
+
+<a href="/dashboard"
+class="btn btn-outline-dark btn-lg">
+
+Dashboard
+
+</a>
+
+</div>
+
+</div>
+
+<div class="col-lg-6 text-center">
+
+<div class="hero-visual text-primary">
+
+<i class="bi bi-graph-up-arrow" style="font-size:12rem;"></i>
+
+<p class="mt-3 fw-semibold">AI Career Assessment</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<hr>
+
+<!-- ================= FEATURES ================= -->
+
+<section class="py-5">
+
+<h2 class="text-center mb-5">
+
+Platform Features
+
+</h2>
+
+<div class="row g-4">
+
+<div class="col-md-4">
+
+<div class="card shadow h-100">
+
+<div class="card-body text-center">
+
+<i class="bi bi-bar-chart-line-fill display-4 text-primary"></i>
+
+<h4 class="mt-3">
+
+Placement Prediction
+
+</h4>
+
+<p>
+
+Predict placement chances using Machine Learning.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100">
+
+<div class="card-body text-center">
+
+<i class="bi bi-file-earmark-text-fill display-4 text-success"></i>
+
+<h4 class="mt-3">
+
+Resume Intelligence
+
+</h4>
+
+<p>
+
+Generate Resume Score,
+Technical Strength,
+Industry Readiness,
+Career Readiness.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100">
+
+<div class="card-body text-center">
+
+<i class="bi bi-briefcase-fill display-4 text-warning"></i>
+
+<h4 class="mt-3">
+
+Role Matching
+
+</h4>
+
+<p>
+
+Recommend top matching job roles using NLP.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100">
+
+<div class="card-body text-center">
+
+<i class="bi bi-lightbulb-fill display-4 text-danger"></i>
+
+<h4 class="mt-3">
+
+Skill Gap Analysis
+
+</h4>
+
+<p>
+
+Identify missing skills
+required for the desired job role.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100">
+
+<div class="card-body text-center">
+
+<i class="bi bi-map-fill display-4 text-info"></i>
+
+<h4 class="mt-3">
+
+Career Roadmap
+
+</h4>
+
+<p>
+
+Receive personalized learning recommendations.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100">
+
+<div class="card-body text-center">
+
+<i class="bi bi-graph-up-arrow display-4 text-secondary"></i>
+
+<h4 class="mt-3">
+
+Explainable AI
+
+</h4>
+
+<p>
+
+Understand predictions with SHAP visualizations.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<hr>
+
+<!-- ================= WORKFLOW ================= -->
+
+<section class="py-5">
+
+<h2 class="text-center mb-5">
+
+How It Works
+
+</h2>
+
+<div class="row text-center">
+
+<div class="col-md-2">
+
+<h1>1</h1>
+
+<p>
+
+Upload Resume
+
+</p>
+
+</div>
+
+<div class="col-md-2">
+
+<h1>2</h1>
+
+<p>
+
+Extract Skills
+
+</p>
+
+</div>
+
+<div class="col-md-2">
+
+<h1>3</h1>
+
+<p>
+
+Predict Placement
+
+</p>
+
+</div>
+
+<div class="col-md-2">
+
+<h1>4</h1>
+
+<p>
+
+Resume Analysis
+
+</p>
+
+</div>
+
+<div class="col-md-2">
+
+<h1>5</h1>
+
+<p>
+
+Role Matching
+
+</p>
+
+</div>
+
+<div class="col-md-2">
+
+<h1>6</h1>
+
+<p>
+
+Career Roadmap
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<hr>
+
+<!-- ================= TECHNOLOGIES ================= -->
+
+<section class="py-5">
+
+<h2 class="text-center mb-5">
+
+Technology Stack
+
+</h2>
+
+<div class="row text-center">
+
+<div class="col">
+
+<span class="badge bg-primary p-3 m-2">Python</span>
+
+<span class="badge bg-success p-3 m-2">Flask</span>
+
+<span class="badge bg-warning text-dark p-3 m-2">Random Forest</span>
+
+<span class="badge bg-danger p-3 m-2">SHAP</span>
+
+<span class="badge bg-info text-dark p-3 m-2">TF-IDF</span>
+
+<span class="badge bg-secondary p-3 m-2">Cosine Similarity</span>
+
+<span class="badge bg-dark p-3 m-2">Bootstrap 5</span>
+
+</div>
+
+</div>
+
+</section>
+
+<hr>
+
+<!-- ================= CTA ================= -->
+
+<section class="text-center py-5">
+
+<h2>
+
+Ready to Analyze Your Career?
+
+</h2>
+
+<p class="lead">
+
+Upload your resume and receive AI-powered career insights.
+
+</p>
+
+<a href="/upload"
+class="btn btn-success btn-lg">
+
+Get Started
+
+</a>
+
+</section>
+
+{% endblock %}

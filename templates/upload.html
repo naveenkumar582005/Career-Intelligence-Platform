@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}
+Upload Resume
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+<div class="row justify-content-center">
+
+<div class="col-lg-10">
+
+<div class="card shadow-lg border-0">
+
+<div class="card-header bg-primary text-white">
+
+<h3 class="mb-0">
+
+Career Assessment Form
+
+</h3>
+
+</div>
+
+<div class="card-body">
+
+<form
+action="/upload_resume"
+method="POST"
+enctype="multipart/form-data"
+onsubmit="return validateForm()">
+
+<!-- Resume Upload -->
+
+<div class="mb-4">
+
+<label class="form-label">
+
+Upload Resume (PDF)
+
+</label>
+
+<input
+type="file"
+class="form-control"
+id="resume"
+name="resume"
+accept=".pdf"
+required>
+
+</div>
+
+<hr>
+
+<h4 class="mb-4">
+
+Academic Details
+
+</h4>
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+
+<label>CGPA</label>
+
+<input
+type="number"
+step="0.01"
+class="form-control"
+name="cgpa"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Projects</label>
+
+<input
+type="number"
+class="form-control"
+name="projects"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Internships</label>
+
+<input
+type="number"
+class="form-control"
+name="internships"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Coding Skills (0-100)</label>
+
+<input
+type="number"
+class="form-control"
+name="coding_skills"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Communication Skills (0-100)</label>
+
+<input
+type="number"
+class="form-control"
+name="communication_skills"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Aptitude Score</label>
+
+<input
+type="number"
+class="form-control"
+name="aptitude_score"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Soft Skills Rating</label>
+
+<input
+type="number"
+class="form-control"
+name="soft_skills"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Certifications</label>
+
+<input
+type="number"
+class="form-control"
+name="certifications"
+required>
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Backlogs</label>
+
+<input
+type="number"
+class="form-control"
+name="backlogs"
+required>
+
+</div>
+
+</div>
+
+<hr>
+
+<h4 class="mb-4">
+
+Career Details
+
+</h4>
+
+<div class="mb-3">
+
+<label>
+
+Target Job Role
+
+</label>
+
+<select
+class="form-select"
+name="target_role">
+
+<option>Machine Learning Engineer</option>
+
+<option>Data Scientist</option>
+
+<option>Data Analyst</option>
+
+<option>Backend Developer</option>
+
+<option>Python Developer</option>
+
+<option>Full Stack Developer</option>
+
+<option>Cloud Engineer</option>
+
+<option>DevOps Engineer</option>
+
+<option>AI Engineer</option>
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label>
+
+Known Skills (Comma Separated)
+
+</label>
+
+<textarea
+class="form-control"
+id="skills"
+rows="4"
+name="skills"
+placeholder="Python, SQL, Flask, Machine Learning, Git">
+
+</textarea>
+
+<div id="skillPreview" class="mt-2"></div>
+
+</div>
+
+<div class="text-center">
+
+<button
+type="submit"
+class="btn btn-success btn-lg">
+
+Analyze My Career
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
