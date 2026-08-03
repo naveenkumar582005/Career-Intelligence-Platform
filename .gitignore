@@ -1,0 +1,28 @@
+# Python Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+venv/
+env/
+ENV/
+
+# System Logs
+backend/logs/*.log
+!backend/logs/.gitkeep
+
+# Temporary Uploads & User Files
+backend/uploads/*.pdf
+!backend/uploads/.gitkeep
+
+# IDE & Editor Configs
+.vscode/
+.idea/
+.cursor/
+*.swp
+
+# OS Files
+.DS_Store
+Thumbs.db

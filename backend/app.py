@@ -10,14 +10,12 @@ from werkzeug.utils import secure_filename
 from config import Config
 from utils.chart_generator import ChartGenerator
 from utils.helper import Helper
+from utils.logger import log_frontend_error, logger
 from utils.predictor import PlacementPredictor
 from utils.resume_parser import ResumeParser
 from utils.resume_score import ResumeScoreCalculator
 from utils.roadmap import CareerRoadmap
 from utils.skill_matcher import SkillMatcher
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -236,6 +234,32 @@ def download_report():
     return send_file(buf, as_attachment=True, download_name="career_report.txt", mimetype="text/plain")
 
 
+@app.route("/api/log-error", methods=["POST"])
+def log_frontend_client_error():
+    """Receives client-side JavaScript errors and logs them into backend/logs/system_errors.log"""
+    data = request.get_json(silent=True) or {}
+    client_file = data.get("file", "script.js")
+    function_name = data.get("function", "unknown")
+    line_no = data.get("line", "N/A")
+    error_msg = data.get("error", "No error details provided")
+    url = data.get("url", request.referrer or "")
+
+    log_frontend_error(client_file, function_name, line_no, error_msg, url)
+    return jsonify({"status": "logged"})
+
+
+@app.errorhandler(Exception)
+def handle_uncaught_exception(exc):
+    """Global exception handler capturing any unhandled error across the backend."""
+    logger.exception("Global Unhandled Exception: %s", exc)
+    return jsonify({
+        "status": "error",
+        "message": f"Server Error: {str(exc)}",
+        "type": exc.__class__.__name__
+    }), 500
+
+
 if __name__ == "__main__":
     print("Starting Career Intelligence Backend REST API on http://localhost:5000")
+    logger.info("Backend REST API starting on http://localhost:5000 (Central Log: backend/logs/system_errors.log)")
     app.run(host="0.0.0.0", port=5000, debug=True)

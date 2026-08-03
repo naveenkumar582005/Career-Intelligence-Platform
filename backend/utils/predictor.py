@@ -1,5 +1,6 @@
 import numpy as np
 import joblib
+from utils.logger import logger
 
 
 class PlacementPredictor:
@@ -21,9 +22,13 @@ class PlacementPredictor:
         scaler_path="model/scaler.pkl",
         encoder_path="model/label_encoder.pkl",
     ):
-        self.model = joblib.load(model_path)
-        self.scaler = joblib.load(scaler_path)
-        self.encoder = joblib.load(encoder_path)
+        try:
+            self.model = joblib.load(model_path)
+            self.scaler = joblib.load(scaler_path)
+            self.encoder = joblib.load(encoder_path)
+        except Exception as exc:
+            logger.exception("Failed to load machine learning models from disk: %s", exc)
+            raise exc
 
     def predict(self, data):
         # Build feature vector in the exact order the model was trained on

@@ -6,6 +6,27 @@
 
 const BACKEND_API = "http://localhost:5000";
 
+// Global error logger sending client-side JS failures to backend central logger
+function logClientErrorToBackend(functionName, errorMsg, lineNo = "N/A") {
+    try {
+        fetch(`${BACKEND_API}/api/log-error`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                file: "script.js",
+                function: functionName,
+                line: lineNo,
+                error: String(errorMsg),
+                url: window.location.href,
+            }),
+        }).catch(() => {});
+    } catch (e) {}
+}
+
+window.onerror = function (message, source, lineno, colno, error) {
+    logClientErrorToBackend("window.onerror", `${message} (${source}:${lineno})`, lineno);
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Career Intelligence Platform Frontend Client Loaded (Connecting to " + BACKEND_API + ")");
 
@@ -63,6 +84,7 @@ async function handleAssessmentSubmit(event) {
         }
     } catch (error) {
         console.error("API Connection Error:", error);
+        logClientErrorToBackend("handleAssessmentSubmit", error.message || String(error));
         alert("Failed to connect to Backend Server on http://localhost:5000. Please ensure the backend is running.");
     } finally {
         if (submitBtn) submitBtn.disabled = false;

@@ -1,9 +1,6 @@
-import logging
 import re
-
 import pdfplumber
-
-logger = logging.getLogger(__name__)
+from utils.logger import logger
 
 # ── Curated skill vocabulary — O(1) lookup via set ────────────────────────────
 _SKILL_SET = {
