@@ -3,7 +3,8 @@ import logging
 import os
 from datetime import datetime
 
-from flask import Flask, flash, redirect, render_template, request, send_file, session, url_for
+from flask import Flask, jsonify, request, send_file, send_from_directory
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 from config import Config
@@ -20,11 +21,12 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(Config)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-os.makedirs("static/images", exist_ok=True)
+os.makedirs(os.path.join(app.config["STATIC_FOLDER"], "images"), exist_ok=True)
 
-# Fail fast — all models must exist (trained in Jupyter notebook)
+# Fail fast — all models must exist
 _required_models = [
     app.config["PLACEMENT_MODEL"],
     app.config["SCALER"],
@@ -35,7 +37,7 @@ _missing = [p for p in _required_models if not os.path.exists(p)]
 if _missing:
     raise FileNotFoundError(
         f"Pre-trained model files not found: {_missing}\n"
-        "Please ensure all model files from the Jupyter notebook are in the model/ folder."
+        "Please ensure all model files are in backend/model/ folder."
     )
 
 predictor = PlacementPredictor(
@@ -48,7 +50,7 @@ resume_calculator = ResumeScoreCalculator()
 skill_matcher = SkillMatcher(app.config["JOB_DATASET"], app.config["TFIDF_VECTORIZER"])
 roadmap_generator = CareerRoadmap()
 helper = Helper()
-chart_generator = ChartGenerator()
+chart_generator = ChartGenerator(output_dir=os.path.join(app.config["STATIC_FOLDER"], "images"))
 
 
 def _to_serializable(value):
@@ -75,7 +77,6 @@ def build_analysis_context(form_data, resume_path):
 
     resume_data = resume_parser.parse_resume(resume_path)
     manual_skills = helper.string_to_skills(form_data.get("skills", ""))
-    # Merge: manual form input + vocabulary-matched skills + heuristic extras
     combined_skills = helper.remove_duplicates(
         manual_skills
         + [s.lower() for s in resume_data.get("skills", [])]
@@ -112,6 +113,8 @@ def build_analysis_context(form_data, resume_path):
     feature_importance = ChartGenerator.feature_importance_from_input(student_data)
     career_readiness = resume_analysis["career_readiness"]
 
+    # Timestamp string to prevent browser caching of charts
+    chart_ts = int(datetime.now().timestamp())
     chart_generator.generate_resume_chart({
         "Resume": resume_analysis["resume_score"],
         "Technical": resume_analysis["technical_strength"],
@@ -121,6 +124,7 @@ def build_analysis_context(form_data, resume_path):
     chart_generator.generate_placement_chart(feature_importance)
     chart_generator.generate_shap_summary(feature_importance)
 
+    base_url = "http://localhost:5000"
     return _to_serializable({
         "placement_result": placement["prediction"],
         "placement_probability": placement["confidence"],
@@ -136,39 +140,46 @@ def build_analysis_context(form_data, resume_path):
         "roadmap": roadmap,
         "resume_email": resume_data.get("email", ""),
         "resume_phone": resume_data.get("phone", ""),
-        "parsed_skills": resume_data.get("skills", []),         # vocabulary-matched
-        "extra_skills": resume_data.get("extra_skills", []),    # heuristic-detected
-        "all_skills": combined_skills,                          # full merged list
+        "parsed_skills": resume_data.get("skills", []),
+        "extra_skills": resume_data.get("extra_skills", []),
+        "all_skills": combined_skills,
         "target_role": target_role,
         "best_job": best_job,
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "charts": {
+            "resume_chart": f"{base_url}/static/images/resume_chart.png?v={chart_ts}",
+            "placement_chart": f"{base_url}/static/images/placement_chart.png?v={chart_ts}",
+            "shap_summary": f"{base_url}/static/images/shap_summary.png?v={chart_ts}",
+        }
     })
 
 
-@app.route("/")
-def home():
-    return render_template("index.html")
+@app.route("/api/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "backend operational",
+        "service": app.config["PROJECT_NAME"],
+        "version": app.config["VERSION"],
+        "port": 5000
+    })
 
 
-@app.route("/upload")
-def upload():
-    return render_template("upload.html")
+@app.route("/static/images/<path:filename>", methods=["GET"])
+def get_chart(filename):
+    return send_from_directory(os.path.join(app.config["STATIC_FOLDER"], "images"), filename)
 
 
-@app.route("/upload_resume", methods=["POST"])
-def upload_resume():
+@app.route("/api/analyze", methods=["POST"])
+def analyze():
     if "resume" not in request.files:
-        flash("Please upload a resume PDF.")
-        return redirect(url_for("upload"))
+        return jsonify({"status": "error", "message": "Please upload a PDF resume."}), 400
 
     file = request.files["resume"]
     if file.filename == "":
-        flash("No file selected.")
-        return redirect(url_for("upload"))
+        return jsonify({"status": "error", "message": "No file selected."}), 400
 
     if not helper.allowed_file(file.filename):
-        flash("Only PDF files are allowed.")
-        return redirect(url_for("upload"))
+        return jsonify({"status": "error", "message": "Only PDF files are allowed."}), 400
 
     filename = secure_filename(file.filename)
     resume_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
@@ -176,61 +187,33 @@ def upload_resume():
 
     try:
         results = build_analysis_context(request.form, resume_path)
-        session["analysis_results"] = results
-        flash("Career analysis completed successfully.")
-        return render_template("result.html", **results)
+        return jsonify({"status": "success", "data": results})
     except Exception as exc:
         logger.exception("Analysis failed: %s", exc)
-        flash("Analysis failed. Please check your inputs and try again.")
-        return redirect(url_for("upload"))
+        return jsonify({"status": "error", "message": f"Analysis failed: {str(exc)}"}), 500
 
 
-@app.route("/dashboard")
-def dashboard():
-    results = session.get("analysis_results")
-    if not results:
-        flash("Please complete the career assessment first.")
-        return redirect(url_for("upload"))
-    return render_template("dashboard.html", **results)
-
-
-@app.route("/about")
-def about():
-    return render_template("about.html")
-
-
-@app.route("/contact", methods=["GET", "POST"])
-def contact():
-    if request.method == "POST":
-        flash("Thank you for contacting us. We will respond soon.")
-        return redirect(url_for("contact"))
-    return render_template("contact.html")
-
-
-@app.route("/download_report")
+@app.route("/api/download-report", methods=["POST"])
 def download_report():
-    results = session.get("analysis_results")
-    if not results:
-        flash("No report available. Complete the assessment first.")
-        return redirect(url_for("upload"))
+    results = request.get_json(silent=True) or {}
 
     lines = [
         "Career Intelligence Platform - Career Report",
         "=" * 50,
-        f"Generated: {results.get('generated_at', '')}",
+        f"Generated: {results.get('generated_at', datetime.now().strftime('%Y-%m-%d %H:%M'))}",
         "",
         "Placement Prediction",
-        f"- Result: {results.get('placement_result')}",
-        f"- Probability: {results.get('placement_probability')}%",
+        f"- Result: {results.get('placement_result', 'N/A')}",
+        f"- Probability: {results.get('placement_probability', 0)}%",
         "",
         "Resume Scores",
-        f"- Resume Score: {results.get('resume_score')}",
-        f"- Technical Strength: {results.get('technical_strength')}",
-        f"- Industry Readiness: {results.get('industry_readiness')}",
-        f"- Career Readiness: {results.get('career_readiness')}",
-        f"- Level: {results.get('readiness_level')}",
+        f"- Resume Score: {results.get('resume_score', 0)}",
+        f"- Technical Strength: {results.get('technical_strength', 0)}",
+        f"- Industry Readiness: {results.get('industry_readiness', 0)}",
+        f"- Career Readiness: {results.get('career_readiness', 0)}",
+        f"- Level: {results.get('readiness_level', 'N/A')}",
         "",
-        f"Best Matching Role: {results.get('best_job')}",
+        f"Best Matching Role: {results.get('best_job', 'N/A')}",
         "",
         "Top Recommended Jobs:",
     ]
@@ -254,4 +237,5 @@ def download_report():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    print("Starting Career Intelligence Backend REST API on http://localhost:5000")
+    app.run(host="0.0.0.0", port=5000, debug=True)

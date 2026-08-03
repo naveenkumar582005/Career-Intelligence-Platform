@@ -27,10 +27,9 @@ Career Assessment Form
 <div class="card-body">
 
 <form
-action="/upload_resume"
-method="POST"
-enctype="multipart/form-data"
-onsubmit="return validateForm()">
+id="assessmentForm"
+onsubmit="handleAssessmentSubmit(event)"
+enctype="multipart/form-data">
 
 <!-- Resume Upload -->
 
@@ -240,11 +239,19 @@ placeholder="Python, SQL, Flask, Machine Learning, Git">
 
 <button
 type="submit"
+id="submitBtn"
 class="btn btn-success btn-lg">
 
-Analyze My Career
+<i class="bi bi-cpu-fill"></i> Analyze My Career
 
 </button>
+
+<div id="loadingStatus" class="mt-4" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 text-primary fw-semibold">Analyzing resume & processing machine learning models...</p>
+</div>
 
 </div>
 
